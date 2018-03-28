@@ -1,0 +1,114 @@
+<html>
+	<head>
+		<title>My first Three.js app</title>
+		<style>
+
+		body {
+			font-family: Monospace;
+			background-color: #f0f0f0;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+
+	</style>
+		<script src="lib/three.min.js"></script>
+		<script src="lib/stats.min.js"></script>
+	</head>
+	<body>
+
+		<script>
+
+			var scene, renderer, camera, stats, sole,terra,luna,earthPivot,moonPivot;
+			var a=0;
+
+			function Start() {
+
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				var geometry = new THREE.SphereGeometry(1,32,32);
+				var texturesun = new THREE.TextureLoader().load( 'texture/sun.jpg');
+				var texturemoon = new THREE.TextureLoader().load( 'texture/moon.jpg' );
+				var textureterra = new THREE.TextureLoader().load( 'texture/terra.jpg' );
+				scene.background = new THREE.TextureLoader().load( "texture/space.jpg" );
+				scene.backgroundSphere = true; 
+				
+				var material = new THREE.MeshBasicMaterial( { map: textureterra } );
+				var materialsun = new THREE.MeshBasicMaterial( { map: texturesun} );
+				var materialmoon = new THREE.MeshBasicMaterial( { map: texturemoon } );
+				sole = new THREE.Mesh( geometry, materialsun );
+				terra= new THREE.Mesh( geometry, material );
+				luna= new THREE.Mesh( geometry, materialmoon );
+				//luna.position.set(3,0,0);
+				luna.scale.set(0.5,0.5,0.5);
+				//terra.position.set(4,0,0);
+				terra.scale.set(0.5,0.5,0.5);
+				
+				terrapos = new THREE.Object3D();
+				terrapos.position.x=5;
+				lunapos = new THREE.Object3D();
+				lunapos.position.x=3;
+				earthPivot = new THREE.Object3D();
+				earthPivot.position = sole.position;
+				
+				moonPivot= new THREE.Object3D();
+				moonPivot.position=terra.position;
+				
+				scene.add( sole );
+				sole.add( earthPivot );
+				sole.add( terrapos );
+				terrapos.add( terra );
+				terra.add(moonPivot);
+				terra.add(lunapos);
+				lunapos.add(luna);
+				
+
+				
+				var pointLight = new THREE.PointLight( 0xffffff );
+				pointLight.position.set( 0,0,0 );
+				pointLight.castShadow=true;
+				scene.add( pointLight );
+				
+				
+				camera.position.z = 6;
+				
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+			}
+
+			function Render() {
+
+				requestAnimationFrame(Render);
+				stats.update();
+				
+				a+=0.5;
+				var axis=new THREE.Vector3(1,0,1).normalize();
+				var theta=(a+45)* Math.PI/180.0;
+				//moonPivot.matrix.makeRotationAxis(axis,theta);			
+				//moonPivot.matrixAutoUpdate=false;
+				terra.rotation.y+=0.05;
+				sole.rotation.y+=0.0005;
+				moonPivot.rotation.y += 0.008;
+				
+				earthPivot.rotation.y += 0.001;
+				terra.rotation.y+=0.0005;
+				
+				renderer.render(scene, camera);
+			}
+
+			Start();
+			Render();
+
+		</script>
+	</body>
+</html>
